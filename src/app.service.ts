@@ -9,4 +9,9 @@ export class AppService {
     const values = this.configService.getValues();
     return `Hello World from ${values.appName}!`;
   }
+
+  getHello2(): string {
+    const values = this.configService.getValues();
+    return `Hello World from another method ${values.appName}!`;
+  }
 }

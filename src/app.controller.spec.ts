@@ -53,5 +53,25 @@ describe('AppController', () => {
         'Hello World from NestJS App Mocked Again!',
       );
     });
+
+    it('should work with two methods sharing the same property', () => {
+      const getValuesSpy = jest
+        .spyOn(configService, 'getValues')
+        .mockReturnValue({
+          appName: 'NestJS App Mocked',
+          appVersion: '1.0.0',
+          appDescription: 'This does not matter much',
+        });
+
+      expect(appController.getHello()).toBe(
+        'Hello World from NestJS App Mocked!',
+      );
+
+      expect(appController.getHello2()).toBe(
+        'Hello World from another method NestJS App Mocked!',
+      );
+
+      expect(getValuesSpy).toHaveBeenCalledTimes(2);
+    });
   });
 });
