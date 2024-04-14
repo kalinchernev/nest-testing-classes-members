@@ -4,65 +4,53 @@ import { AppService } from './app.service';
 import { ConfigService } from './config/config.service';
 
 describe('AppController', () => {
-  let app: TestingModule;
+  let appController: AppController;
+  let configService: ConfigService;
 
-  beforeAll(async () => {
-    app = await Test.createTestingModule({
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
       providers: [
         AppService,
         {
           provide: ConfigService,
           useValue: {
-            getValues: () => ({
-              appName: 'NestJS App',
-              appVersion: '1.0.0',
-              appDescription: 'This does not matter much',
-            }),
+            getValues: jest.fn(),
           },
         },
       ],
     }).compile();
+
+    appController = app.get<AppController>(AppController);
+    configService = app.get<ConfigService>(ConfigService);
   });
 
   describe('getHello', () => {
-    it('should return "Hello World!"', () => {
-      jest.spyOn(app.get(ConfigService), 'getValues').mockReturnValue({
-        appName: 'NestJS App Mocked',
-        appVersion: '1.0.0',
-        appDescription: 'This does not matter much',
-      });
-      const appController = app.get(AppController);
-      expect(appController.getHello()).toBe('Hello World from NestJS App!');
-    });
-
     it('should change accordingly with mocked values', () => {
-      jest.spyOn(app.get(ConfigService), 'getValues').mockReturnValue({
-        appName: 'NestJS App Mocked',
-        appVersion: '1.0.0',
-        appDescription: 'This does not matter much',
-      });
-
-      const appController = app.get(AppController);
+      const getValuesSpy = jest
+        .spyOn(configService, 'getValues')
+        .mockReturnValue({
+          appName: 'NestJS App Mocked',
+          appVersion: '1.0.0',
+          appDescription: 'This does not matter much',
+        });
 
       expect(appController.getHello()).toBe(
         'Hello World from NestJS App Mocked!',
       );
+
+      expect(getValuesSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should change accordingly with mocked implementation', () => {
-      jest
-        .spyOn(app.get(ConfigService), 'getValues')
-        .mockImplementation(() => ({
-          appName: 'NestJS App Mocked Again',
-          appVersion: '1.0.0',
-          appDescription: 'This does not matter much',
-        }));
-
-      const appController = app.get(AppController);
+      jest.spyOn(configService, 'getValues').mockImplementation(() => ({
+        appName: 'NestJS App Mocked Again',
+        appVersion: '1.0.0',
+        appDescription: 'This does not matter much',
+      }));
 
       expect(appController.getHello()).toBe(
-        'Hello World from NestJS App Mocked!',
+        'Hello World from NestJS App Mocked Again!',
       );
     });
   });

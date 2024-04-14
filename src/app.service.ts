@@ -3,13 +3,10 @@ import { ConfigService } from './config/config.service';
 
 @Injectable()
 export class AppService {
-  appName: string;
-
-  constructor(private readonly configService: ConfigService) {
-    this.appName = this.configService.getValues().appName;
-  }
+  constructor(private readonly configService: ConfigService) {}
 
   getHello(): string {
-    return `Hello World from ${this.appName}!`;
+    const values = this.configService.getValues();
+    return `Hello World from ${values.appName}!`;
   }
 }
